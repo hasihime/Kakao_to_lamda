@@ -30,5 +30,11 @@ jobs:
       - name: SAM Build
         run: sam build
 
-      - name: SAM Deploy
-        run: sam deploy --stack-name kakako-lamda --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset
+      - name: SAM Deploy (auto-create artifact bucket)
+        run: |
+          sam deploy \
+            --stack-name kakako-lamda \
+            --capabilities CAPABILITY_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --resolve-s3
