@@ -1,0 +1,9 @@
+{
+  "name": "kakao-To-Lamda",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "handler.js",
+  "dependencies": {
+    "openai": "^4.57.0"
+  }
+}

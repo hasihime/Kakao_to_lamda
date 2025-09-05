@@ -1,0 +1,44 @@
+Transform: AWS::Serverless-2016-10-31
+Description: Kakao Skill → API Gateway → Lambda → OpenAI (Minimal)
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 12
+    MemorySize: 512
+
+Resources:
+  SkillApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - "POST"
+        AllowHeaders:
+          - "content-type"
+
+  SkillFn:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: handler.main
+      Environment:
+        Variables:
+          # OpenAI 키는 이후 Secrets Manager에 넣고 아래처럼 참조해도 됨:
+          # OPENAI_API_KEY: "{{resolve:secretsmanager:openai/api-key}}"
+          OPENAI_API_KEY: ""  # 초기 테스트용, 실운영은 Secrets Manager 사용 권장
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        KakaoSkillRoute:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref SkillApi
+            Path: /skill/qa
+            Method: POST
+Outputs:
+  InvokeURL:
+    Description: "HTTP API invoke URL (append /skill/qa)"
+    Value: !Sub "https://${SkillApi}.execute-api.${AWS::Region}.amazonaws.com/skill/qa"
